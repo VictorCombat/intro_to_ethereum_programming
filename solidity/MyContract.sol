@@ -1,59 +1,28 @@
 pragma solidity 0.5.1;
 
 contract MyContract {
-    uint256 public peopleCount = 0;
-    mapping(uint => Person) public people;
+    mapping(address => uint256) public balances;
+    address payable wallet;
     
-    address owner;
-    
-    // create own modifier
-    modifier onlyOwner() {
-        // msg.sender : the person who execute this contract
-        // require : throw an error if the condition is false
-        require(msg.sender == owner);
-        _; // this will call the function owned by this modifier here
+    event Purchase(
+        address indexed _buyer,
+        uint256 _amount
+    );
+
+    constructor(address payable _wallet) public {
+        wallet = _wallet;
     }
     
-    uint256 openingTime = 1607291030; // Epoch timestamp
-    
-    modifier onlyWhileOpen() {
-        // block.timestamp : access time of the block in Epoch Unix Timestamp
-        require(block.timestamp >= openingTime);
-        _;
+    function() external payable {
+        buyToken();
     }
-    
-    struct Person {
-        uint _id;
-        string _firstName;
-        string _lastName;
-    }
-    
-    constructor() public {
-        owner = msg.sender;
-    }
-    
-    // onlyOwner modifier : onlyOwner can call this function
-    function addPerson(
-        string memory _firstName,
-        string memory _lastName)
-        public onlyOwner
-    {
-        incrementCount();
-        people[peopleCount] = Person(peopleCount, _firstName, _lastName);
-    }
-    
-    function incrementCount() internal {
-        peopleCount += 1;
-    }
-    
-    // different modifier by time
-    function addPersonTime(
-        string memory _firstName,
-        string memory _lastName)
-        public onlyWhileOpen
-    {
-        incrementCount();
-        people[peopleCount] = Person(peopleCount, _firstName, _lastName);
+
+    function buyToken() public payable {
+        // buy a token
+        balances[msg.sender] += 1;
+        // send ether to the wallet
+        wallet.transfer(msg.value);
+        emit Purchase(msg.sender, 1);
     }
 }
 
