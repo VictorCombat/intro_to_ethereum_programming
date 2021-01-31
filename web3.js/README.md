@@ -6,6 +6,10 @@
 
 `node`
 
+## Launch node with file
+
+`node <filename>`
+
 ## Using Web3.js
 ```javascript
 var Web3 = require('web3')
